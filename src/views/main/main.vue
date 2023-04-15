@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import useCounterStore from '@/store/counter';
 import { baseRequest } from '@/service/index';
+import { ElMessage } from 'element-plus';
 
 const counterStore = useCounterStore();
 
@@ -11,6 +12,8 @@ const changeCounter = () => {
 const requestData = () => {
   baseRequest.get({ url: '/login' }).then((res) => {
     console.log(res);
+
+    ElMessage.success('请求成功');
   });
 };
 </script>
@@ -20,9 +23,9 @@ const requestData = () => {
     {{ counterStore.counter }}
   </div>
   <p>{{ counterStore.doubleCounter }}</p>
-  <button @click="changeCounter">+1</button>
+  <el-button type="primary" @click="changeCounter">count +1</el-button>
 
-  <button @click="requestData">请求数据</button>
+  <el-button type="danger" @click="requestData">请求数据</el-button>
 </template>
 
 <style scoped>
