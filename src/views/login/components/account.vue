@@ -1,14 +1,18 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
+import useLoginStore from '@/store/modules/login';
+import { LOGIN_NAME, LOGIN_PASSWORD } from '@/global/constants';
+import { localCache } from '@/utils/cache';
 import type { FormRules, ElForm } from 'element-plus';
-import router from '@/router';
+import type { IAccount } from '@/types';
 
+const store = useLoginStore();
 const formRef = ref<InstanceType<typeof ElForm>>();
 
-const loginInfo = reactive({
-  name: '',
-  password: ''
+const loginInfo = reactive<IAccount>({
+  name: localCache.getCache(LOGIN_NAME) ?? '',
+  password: localCache.getCache(LOGIN_PASSWORD) ?? ''
 });
 
 const rules: FormRules = {
@@ -22,10 +26,19 @@ const rules: FormRules = {
   ]
 };
 
-const loginAction = () => {
+const loginAction = (remberPwd: boolean) => {
   formRef.value?.validate((valid) => {
     if (valid) {
-      console.log('校验成功');
+      const { name, password } = loginInfo;
+      store.loginStoreAction({ name, password });
+
+      if (remberPwd) {
+        localCache.setCache(LOGIN_NAME, name);
+        localCache.setCache(LOGIN_PASSWORD, password);
+      } else {
+        localCache.removeCache(LOGIN_NAME);
+        localCache.removeCache(LOGIN_PASSWORD);
+      }
     } else {
       ElMessage.warning('账号密码输入格式有误！');
     }

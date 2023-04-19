@@ -1,12 +1,19 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Account from './account.vue';
 import Qrcode from './qrcode.vue';
+import { localCache } from '@/utils/cache';
+import { REMBER_PWD } from '@/global/constants';
 
 const accountRef = ref<InstanceType<typeof Account>>();
+const remberPwd = ref<boolean>(localCache.getCache(REMBER_PWD) ?? false);
+
+watch(remberPwd, (value) => {
+  localCache.setCache(REMBER_PWD, value);
+});
 
 const handleLoginBtnClick = () => {
-  accountRef.value?.loginAction();
+  accountRef.value?.loginAction(remberPwd.value);
 };
 </script>
 
@@ -26,7 +33,7 @@ const handleLoginBtnClick = () => {
     </div>
 
     <div class="control">
-      <el-checkbox>记住密码</el-checkbox>
+      <el-checkbox v-model="remberPwd">记住密码</el-checkbox>
       <a href="">忘记密码</a>
     </div>
 
